@@ -27,7 +27,7 @@ dependencies {
 
 ext {
     bintrayRepo = 'maven'
-    bintrayName = 'UILibrary'
+    bintrayName = 'permissionsHelper'
 
     publishedGroupId = 'com.didikee'
     libraryName = 'permissionsHelper'
@@ -35,10 +35,10 @@ ext {
 
     libraryDescription = 'A Android permissions helper libs'
 
-    siteUrl = 'https://github.com/didikee/AndroidNormalUILibs'
-    gitUrl = 'https://github.com/didikee/AndroidNormalUILibs.git'
+    siteUrl = 'https://github.com/didikee/PermissionsHelper'
+    gitUrl = 'https://github.com/didikee/PermissionsHelper.git'
 
-    libraryVersion = '0.8.0'
+    libraryVersion = '0.1.0'
 
     developerId = 'didikee'
     developerName = 'didikee'
