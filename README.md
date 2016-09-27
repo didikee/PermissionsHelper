@@ -207,4 +207,4 @@ public class WelcomeActivity extends BaseActivity {
 ```
 
 ### 运行时 申请权限 图示 ###
-![device-2016-08-06-144845](http://oahzrw11n.bkt.clouddn.com/device-2016-08-06-144845.png)
+![http://oahzrw11n.bkt.clouddn.com/device-2016-08-06-144845.png](http://oahzrw11n.bkt.clouddn.com/device-2016-08-06-144845.png)
