@@ -2,6 +2,7 @@ package didikee.com.permissionshelper;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,7 +11,6 @@ import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 
 import didikee.com.permissionshelper.permission.PermissionsChecker;
 
@@ -110,10 +110,10 @@ public class PermissionsHelper {
     }
 
     public void startRequestNeedPermissions() {
-        if (Build.VERSION.SDK_INT < 23) {
-            allPermissionsGranted();
-        }else {
+        if (mChecker.shouldCheckPermission()){
             requestNeedPermissions();
+        }else {
+            allPermissionsGranted();
         }
     }
 

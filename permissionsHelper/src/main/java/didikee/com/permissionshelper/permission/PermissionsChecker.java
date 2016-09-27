@@ -22,10 +22,10 @@ public class PermissionsChecker {
      * @return
      */
     public boolean shouldCheckPermission(){
-        if (Build.VERSION.SDK_INT>=23){
-            return true;
+        if (Build.VERSION.SDK_INT<23){
+            return false;
         }
-        return false;
+        return true;
     }
 
     /**
