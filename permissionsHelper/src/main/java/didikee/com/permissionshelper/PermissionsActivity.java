@@ -7,7 +7,7 @@
 //import android.util.Log;
 //
 //import didikee.com.permissionshelper.permission.DangerousPermissions;
-//import didikee.com.permissionshelper.permission.PermissionsHelper;
+//import didikee.com.permissionshelper.PermissionsHelper;
 //
 //
 //public class PermissionsActivity extends AppCompatActivity {

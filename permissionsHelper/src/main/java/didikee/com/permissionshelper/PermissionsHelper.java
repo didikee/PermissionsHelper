@@ -1,4 +1,4 @@
-package didikee.com.permissionshelper.permission;
+package didikee.com.permissionshelper;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -11,6 +11,8 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
+
+import didikee.com.permissionshelper.permission.PermissionsChecker;
 
 /**
  * Created by didikee on 2016/8/6.
@@ -26,6 +28,8 @@ public class PermissionsHelper {
     private PermissionsChecker mChecker;
     private onAllNeedPermissionsGrantedListener mListener;
     private boolean isShowing = false;
+    private String mTitle="权限不足";
+    private String mContent="需要必须的权限才能正常使用本应用";
 
     public PermissionsHelper(Activity activity, String[] mNeedPermissions) {
         this.mActivity = activity;
@@ -117,8 +121,8 @@ public class PermissionsHelper {
     // 显示缺失权限提示
     private void showSettingPermissionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-        builder.setTitle("未获取权限");
-        builder.setMessage("权限不足无法正常使用 NB 功能,我们不会收集您的隐私(才怪嘞!=.=)");
+        builder.setTitle(mTitle);
+        builder.setMessage(mContent);
 
         // 拒绝, 退出应用
         builder.setNegativeButton("退出", new DialogInterface.OnClickListener() {
@@ -144,6 +148,14 @@ public class PermissionsHelper {
         builder.setCancelable(false);
 
         builder.show();
+    }
+
+    public void setPermissionDialogTitle(String title){
+        this.mTitle=title;
+    }
+
+    public void setPermissionDialogContent(String content){
+        this.mContent=content;
     }
 
     /**
