@@ -110,8 +110,15 @@ public class PermissionsHelper {
     }
 
     public void startRequestNeedPermissions() {
-        if (mChecker.checkSelfPermissions(mNeedPermissions)) {
+        if (Build.VERSION.SDK_INT < 23) {
+            allPermissionsGranted();
+        }else {
+            requestNeedPermissions();
+        }
+    }
 
+    private void requestNeedPermissions(){
+        if (mChecker.checkSelfPermissions(mNeedPermissions)) {
             allPermissionsGranted(); // 全部权限都已获取
         } else {
             requestPermissions(mNeedPermissions); // 请求权限
@@ -166,7 +173,7 @@ public class PermissionsHelper {
      */
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode==PERMISSION_REQUEST_SETTING) {
-            startRequestNeedPermissions();
+            requestNeedPermissions();
         }
     }
 
