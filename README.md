@@ -2,6 +2,13 @@
 
 > **项目地址:[https://github.com/didikee/PermissionsHelper](https://github.com/didikee/PermissionsHelper)**
 
+### Gradle
+```
+dependencies {
+    compile 'com.didikee:permissionsHelper:0.1.4'
+}
+```
+
 > **9组 危险权限,按照你的项目需求申请,不要盲目,切勿贪婪.更不要偷懒复制粘贴**
 
 	<!-- Dangerous Permissions start -->

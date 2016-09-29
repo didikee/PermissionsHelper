@@ -38,7 +38,7 @@ ext {
     siteUrl = 'https://github.com/didikee/PermissionsHelper'
     gitUrl = 'https://github.com/didikee/PermissionsHelper.git'
 
-    libraryVersion = '0.1.3'
+    libraryVersion = '0.1.4'
 
     developerId = 'didikee'
     developerName = 'didikee'
