@@ -20,7 +20,7 @@ import didikee.com.permissionshelper.permission.DangerousPermissions;
  * Created time 2016/12/13
  * Description:
  * == Dangerous Permissions start  ==
- * == PHONE ==
+ * == PHONE
  * <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
  * <uses-permission android:name="android.permission.CALL_PHONE"/>
  * <uses-permission android:name="android.permission.READ_CALL_LOG"/>
@@ -28,29 +28,29 @@ import didikee.com.permissionshelper.permission.DangerousPermissions;
  * <uses-permission android:name="android.permission.WRITE_CALL_LOG"/>
  * <uses-permission android:name="android.permission.USE_SIP"/>
  * <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"/>
- * == CALENDAR ==
+ * == CALENDAR
  * <uses-permission android:name="android.permission.READ_CALENDAR"/>
  * <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
- * == CAMERA ==
+ * == CAMERA
  * <uses-permission android:name="android.permission.CAMERA"/>
- * == CONTACTS ==
+ * == CONTACTS
  * <uses-permission android:name="android.permission.READ_CONTACTS"/>
  * <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
  * <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
- * == LOCATION ==
+ * == LOCATION
  * <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
  * <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
- * == MICROPHONE ==
+ * == MICROPHONE
  * <uses-permission android:name="android.permission.RECORD_AUDIO"/>
- * == SENSORS ==
+ * == SENSORS
  * <uses-permission android:name="android.permission.BODY_SENSORS"/>
- * == SMS ==
+ * == SMS
  * <uses-permission android:name="android.permission.SEND_SMS"/>
  * <uses-permission android:name="android.permission.RECEIVE_SMS"/>
  * <uses-permission android:name="android.permission.READ_SMS"/>
  * <uses-permission android:name="android.permission.RECEIVE_WAP_PUSH"/>
  * <uses-permission android:name="android.permission.RECEIVE_MMS"/>
- * == STORAGE ==
+ * == STORAGE
  * <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
  * <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
  * == Dangerous Permissions end ==
