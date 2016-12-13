@@ -11,6 +11,8 @@ import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.text.TextUtils;
+import android.util.Pair;
 
 import didikee.com.permissionshelper.permission.PermissionsChecker;
 
@@ -28,8 +30,10 @@ public class PermissionsHelper {
     private PermissionsChecker mChecker;
     private onAllNeedPermissionsGrantedListener mListener;
     private boolean isShowing = false;
-    private String mTitle="权限不足";
-    private String mContent="需要必须的权限才能正常使用本应用";
+
+    private Pair<String,String> mTitleAndContent;
+    private Pair<String,String> mButtonText;
+    private onNegativeButtonClickListener mNegativeButtonClickListener;
 
     public PermissionsHelper(Activity activity, String[] mNeedPermissions) {
         this.mActivity = activity;
@@ -37,14 +41,22 @@ public class PermissionsHelper {
         mChecker = new PermissionsChecker(mActivity);
     }
 
+    public void setParams(Pair<String,String> titleAndContent,Pair<String,String> buttonText,boolean isShowing){
+        this.mTitleAndContent=titleAndContent;
+        this.mButtonText=buttonText;
+        this.isShowing=isShowing;
+    }
+
 
     public void onDestroy() {
-        mChecker.onDestroy();
+        if (mChecker!=null)mChecker.onDestroy();
         mActivity = null;
         mChecker = null;
         mNeedPermissions = null;
         mListener = null;
     }
+
+
 
     /**
      * 检测是不是所有的权限都有了
@@ -64,15 +76,19 @@ public class PermissionsHelper {
     @TargetApi(Build.VERSION_CODES.M)
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[]
             grantResults) {
-        isShowing = false;
         if (hasDestroy()) {
             return;
         }
         if (requestCode == PERMISSION_REQUEST_CODE && grantResults.length > 0 &&
                 hasAllPermissionsGranted(grantResults)) {
             allPermissionsGranted();
-        }else if (!isShowing){
+        }else if (isShowing){
             showSettingPermissionDialog();
+        }else {
+            if (mListener != null) {
+                mListener.onPermissionsDenied();
+            }
+            onDestroy();
         }
     }
 
@@ -120,29 +136,37 @@ public class PermissionsHelper {
     private void requestNeedPermissions(){
         if (mChecker.checkSelfPermissions(mNeedPermissions)) {
             allPermissionsGranted(); // 全部权限都已获取
-        } else {
+        } else if (mChecker.shouldShowRequestPermissions(mNeedPermissions)){
             requestPermissions(mNeedPermissions); // 请求权限
+        }else {
+            if (mListener!=null){mListener.hasLockForever();}
         }
     }
 
     // 显示缺失权限提示
     private void showSettingPermissionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-        builder.setTitle(mTitle);
-        builder.setMessage(mContent);
-
+        String title= mTitleAndContent==null || TextUtils.isEmpty(mTitleAndContent.first) ? "权限不足" : mTitleAndContent.first;
+        String content= mTitleAndContent==null || TextUtils.isEmpty(mTitleAndContent.second) ? "需要必须的权限才能正常使用本应用" : mTitleAndContent.second;
+        builder.setTitle(title);
+        builder.setMessage(content);
+        String positiveText= mButtonText==null || TextUtils.isEmpty(mButtonText.first) ? "设置" : mButtonText.first;
+        String negativeText= mButtonText==null || TextUtils.isEmpty(mButtonText.second) ? "退出" : mButtonText.second;
         // 拒绝, 退出应用
-        builder.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(negativeText, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (mListener != null) {
                     mListener.onPermissionsDenied();
                 }
+                if (mNegativeButtonClickListener!=null){
+                    mNegativeButtonClickListener.negativeButtonClick();
+                }
                 onDestroy();
             }
         });
 
-        builder.setPositiveButton("设置", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(positiveText, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // 启动app设置界面,用户手动获取权限
@@ -155,14 +179,6 @@ public class PermissionsHelper {
         builder.setCancelable(false);
 
         builder.show();
-    }
-
-    public void setPermissionDialogTitle(String title){
-        this.mTitle=title;
-    }
-
-    public void setPermissionDialogContent(String content){
-        this.mContent=content;
     }
 
     /**
@@ -181,7 +197,18 @@ public class PermissionsHelper {
         void onAllNeedPermissionsGranted();//全部许可了,已经获得了所有权限
 
         void onPermissionsDenied();//被拒绝了,只要有一个权限被拒绝那么就会调用
+
+        void hasLockForever();//用户已经永久的拒绝了
     }
+
+    public interface onNegativeButtonClickListener{
+        void negativeButtonClick();
+    }
+
+    public void setonNegativeButtonClickListener(onNegativeButtonClickListener negativeButtonClickListener){
+        this.mNegativeButtonClickListener=negativeButtonClickListener;
+    }
+
 
     public void setonAllNeedPermissionsGrantedListener(onAllNeedPermissionsGrantedListener
                                                                listener) {

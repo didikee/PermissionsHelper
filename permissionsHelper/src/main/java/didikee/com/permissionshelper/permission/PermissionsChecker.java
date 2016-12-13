@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
 /**
@@ -61,5 +62,17 @@ public class PermissionsChecker {
         return true;
     }
 
+    public boolean shouldShowRequestPermissions(String... permissions){
+        if (permissions.length==0){
+            return false;
+        }
+        for (String permission : permissions) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(mActivity,permission)){
+                return true;
+            }
+        }
+        return false;
+
+    }
 
 }
