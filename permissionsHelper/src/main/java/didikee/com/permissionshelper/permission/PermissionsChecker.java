@@ -52,7 +52,7 @@ public class PermissionsChecker {
      */
     public boolean checkSelfPermissions(String... permissions) {
         if (permissions.length==0){
-            return false;
+            return true;
         }
         for (String permission : permissions) {
             if (!checkSelfPermission(permission)) {

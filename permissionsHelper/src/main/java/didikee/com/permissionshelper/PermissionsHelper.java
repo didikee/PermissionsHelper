@@ -12,8 +12,8 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
-import android.util.Pair;
 
+import didikee.com.permissionshelper.info.DialogInfo;
 import didikee.com.permissionshelper.permission.PermissionsChecker;
 
 /**
@@ -24,6 +24,7 @@ public class PermissionsHelper {
 
     public static final int PERMISSION_REQUEST_CODE = 44;
     public static final int PERMISSION_REQUEST_SETTING = 45;
+    private final Boolean isFirstTime;
     private String[] mNeedPermissions;//需要的权限
 
     private Activity mActivity;
@@ -31,31 +32,29 @@ public class PermissionsHelper {
     private onAllNeedPermissionsGrantedListener mListener;
     private boolean isShowing = false;
 
-    private Pair<String,String> mTitleAndContent;
-    private Pair<String,String> mButtonText;
     private onNegativeButtonClickListener mNegativeButtonClickListener;
+    private DialogInfo mDialogInfo;
 
-    public PermissionsHelper(Activity activity, String[] mNeedPermissions) {
+    public PermissionsHelper(Activity activity, String[] mNeedPermissions, Boolean isFirstTime) {
         this.mActivity = activity;
         this.mNeedPermissions = mNeedPermissions;
+        this.isFirstTime = isFirstTime;
         mChecker = new PermissionsChecker(mActivity);
     }
 
-    public void setParams(Pair<String,String> titleAndContent,Pair<String,String> buttonText,boolean isShowing){
-        this.mTitleAndContent=titleAndContent;
-        this.mButtonText=buttonText;
-        this.isShowing=isShowing;
+    public void setParams(DialogInfo dialogInfo) {
+        this.mDialogInfo = dialogInfo == null ? new DialogInfo() : dialogInfo;
+        this.isShowing = mDialogInfo.isShow();
     }
 
 
     public void onDestroy() {
-        if (mChecker!=null)mChecker.onDestroy();
+        if (mChecker != null) mChecker.onDestroy();
         mActivity = null;
         mChecker = null;
         mNeedPermissions = null;
         mListener = null;
     }
-
 
 
     /**
@@ -82,9 +81,9 @@ public class PermissionsHelper {
         if (requestCode == PERMISSION_REQUEST_CODE && grantResults.length > 0 &&
                 hasAllPermissionsGranted(grantResults)) {
             allPermissionsGranted();
-        }else if (isShowing){
+        } else if (isShowing) {
             showSettingPermissionDialog();
-        }else {
+        } else {
             if (mListener != null) {
                 mListener.onPermissionsDenied();
             }
@@ -126,32 +125,71 @@ public class PermissionsHelper {
     }
 
     public void startRequestNeedPermissions() {
-        if (mChecker.shouldCheckPermission()){
+        if (mChecker.shouldCheckPermission()) {
             requestNeedPermissions();
-        }else {
+        } else {
             allPermissionsGranted();
         }
     }
 
-    private void requestNeedPermissions(){
+    private void requestNeedPermissions() {
+//        if (isFirstTime){
+//            if (mChecker.checkSelfPermissions(mNeedPermissions)) {
+//                allPermissionsGranted(); // 全部权限都已获取
+//            } else {
+//                if (mListener!=null){mListener.hasLockForever();}
+//            }
+//        }else {
+//            if (mChecker.checkSelfPermissions(mNeedPermissions)) {
+//                allPermissionsGranted(); // 全部权限都已获取
+//            } else if (mChecker.shouldShowRequestPermissions(mNeedPermissions) ){
+//                requestPermissions(mNeedPermissions); // 请求权限
+//            }else {
+//                if (mListener!=null){mListener.hasLockForever();}
+//            }
+//        }
+
         if (mChecker.checkSelfPermissions(mNeedPermissions)) {
             allPermissionsGranted(); // 全部权限都已获取
-        } else if (mChecker.shouldShowRequestPermissions(mNeedPermissions)){
-            requestPermissions(mNeedPermissions); // 请求权限
-        }else {
-            if (mListener!=null){mListener.hasLockForever();}
+        } else {
+            if (isFirstTime == null) {
+                requestPermissions(mNeedPermissions); // 请求权限
+            } else if (isFirstTime) {
+                requestPermissions(mNeedPermissions); // 请求权限
+            } else {
+                if (mChecker.shouldShowRequestPermissions(mNeedPermissions)) {
+                    if (mListener != null) {
+                        mListener.onBeforeRequestFinalPermissions(this);
+                    } else {
+                        requestPermissions(mNeedPermissions); // 请求权限
+                    }
+                }else {
+                    if (mListener != null) {
+                        mListener.hasLockForever();
+                    }
+                }
+            }
+
         }
+
+    }
+
+    public void continueRequestPermissions() {
+        requestPermissions(mNeedPermissions);
     }
 
     // 显示缺失权限提示
     private void showSettingPermissionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-        String title= mTitleAndContent==null || TextUtils.isEmpty(mTitleAndContent.first) ? "权限不足" : mTitleAndContent.first;
-        String content= mTitleAndContent==null || TextUtils.isEmpty(mTitleAndContent.second) ? "需要必须的权限才能正常使用本应用" : mTitleAndContent.second;
+        String title = TextUtils.isEmpty(mDialogInfo.getTitle()) ? "权限不足" : mDialogInfo.getTitle();
+        String content = TextUtils.isEmpty(mDialogInfo.getContent()) ? "需要必须的权限才能正常使用本应用" :
+                mDialogInfo.getContent();
         builder.setTitle(title);
         builder.setMessage(content);
-        String positiveText= mButtonText==null || TextUtils.isEmpty(mButtonText.first) ? "设置" : mButtonText.first;
-        String negativeText= mButtonText==null || TextUtils.isEmpty(mButtonText.second) ? "退出" : mButtonText.second;
+        String positiveText = TextUtils.isEmpty(mDialogInfo.getPositiveButtonText()) ? "设置" :
+                mDialogInfo.getPositiveButtonText();
+        String negativeText = TextUtils.isEmpty(mDialogInfo.getNegativeButtonText()) ? "退出" :
+                mDialogInfo.getNegativeButtonText();
         // 拒绝, 退出应用
         builder.setNegativeButton(negativeText, new DialogInterface.OnClickListener() {
             @Override
@@ -159,7 +197,7 @@ public class PermissionsHelper {
                 if (mListener != null) {
                     mListener.onPermissionsDenied();
                 }
-                if (mNegativeButtonClickListener!=null){
+                if (mNegativeButtonClickListener != null) {
                     mNegativeButtonClickListener.negativeButtonClick();
                 }
                 onDestroy();
@@ -171,8 +209,8 @@ public class PermissionsHelper {
             public void onClick(DialogInterface dialog, int which) {
                 // 启动app设置界面,用户手动获取权限
                 Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                intent.setData(Uri.parse("package:"+ mActivity.getPackageName()));
-                mActivity.startActivityForResult(intent,PERMISSION_REQUEST_SETTING);
+                intent.setData(Uri.parse("package:" + mActivity.getPackageName()));
+                mActivity.startActivityForResult(intent, PERMISSION_REQUEST_SETTING);
             }
         });
 
@@ -188,7 +226,7 @@ public class PermissionsHelper {
      * @param data
      */
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode==PERMISSION_REQUEST_SETTING) {
+        if (requestCode == PERMISSION_REQUEST_SETTING) {
             requestNeedPermissions();
         }
     }
@@ -199,14 +237,17 @@ public class PermissionsHelper {
         void onPermissionsDenied();//被拒绝了,只要有一个权限被拒绝那么就会调用
 
         void hasLockForever();//用户已经永久的拒绝了
+
+        void onBeforeRequestFinalPermissions(PermissionsHelper helper);//被拒绝后,在最后一次申请权限之前
     }
 
-    public interface onNegativeButtonClickListener{
+    public interface onNegativeButtonClickListener {
         void negativeButtonClick();
     }
 
-    public void setonNegativeButtonClickListener(onNegativeButtonClickListener negativeButtonClickListener){
-        this.mNegativeButtonClickListener=negativeButtonClickListener;
+    public void setonNegativeButtonClickListener(onNegativeButtonClickListener
+                                                         negativeButtonClickListener) {
+        this.mNegativeButtonClickListener = negativeButtonClickListener;
     }
 
 

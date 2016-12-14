@@ -7,12 +7,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import didikee.com.permissionshelper.info.DialogInfo;
 import didikee.com.permissionshelper.permission.DangerousPermissions;
 
 /**
@@ -21,38 +21,38 @@ import didikee.com.permissionshelper.permission.DangerousPermissions;
  * Description:
  * == Dangerous Permissions start  ==
  * == PHONE
- * <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
- * <uses-permission android:name="android.permission.CALL_PHONE"/>
- * <uses-permission android:name="android.permission.READ_CALL_LOG"/>
- * <uses-permission android:name="android.permission.ADD_VOICEMAIL"/>
- * <uses-permission android:name="android.permission.WRITE_CALL_LOG"/>
- * <uses-permission android:name="android.permission.USE_SIP"/>
- * <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"/>
+ * uses-permission android:name="android.permission.READ_PHONE_STATE"
+ * uses-permission android:name="android.permission.CALL_PHONE"
+ * uses-permission android:name="android.permission.READ_CALL_LOG"
+ * uses-permission android:name="android.permission.ADD_VOICEMAIL"
+ * uses-permission android:name="android.permission.WRITE_CALL_LOG"
+ * uses-permission android:name="android.permission.USE_SIP"
+ * uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"
  * == CALENDAR
- * <uses-permission android:name="android.permission.READ_CALENDAR"/>
- * <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
+ * uses-permission android:name="android.permission.READ_CALENDAR"
+ * uses-permission android:name="android.permission.WRITE_CALENDAR"
  * == CAMERA
- * <uses-permission android:name="android.permission.CAMERA"/>
+ * uses-permission android:name="android.permission.CAMERA"
  * == CONTACTS
- * <uses-permission android:name="android.permission.READ_CONTACTS"/>
- * <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
- * <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+ * uses-permission android:name="android.permission.READ_CONTACTS"
+ * uses-permission android:name="android.permission.WRITE_CONTACTS"
+ * uses-permission android:name="android.permission.GET_ACCOUNTS"
  * == LOCATION
- * <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
- * <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+ * uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+ * uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"
  * == MICROPHONE
- * <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+ * uses-permission android:name="android.permission.RECORD_AUDIO"
  * == SENSORS
- * <uses-permission android:name="android.permission.BODY_SENSORS"/>
+ * uses-permission android:name="android.permission.BODY_SENSORS"
  * == SMS
- * <uses-permission android:name="android.permission.SEND_SMS"/>
- * <uses-permission android:name="android.permission.RECEIVE_SMS"/>
- * <uses-permission android:name="android.permission.READ_SMS"/>
- * <uses-permission android:name="android.permission.RECEIVE_WAP_PUSH"/>
- * <uses-permission android:name="android.permission.RECEIVE_MMS"/>
+ * uses-permission android:name="android.permission.SEND_SMS"
+ * uses-permission android:name="android.permission.RECEIVE_SMS"
+ * uses-permission android:name="android.permission.READ_SMS"
+ * uses-permission android:name="android.permission.RECEIVE_WAP_PUSH"
+ * uses-permission android:name="android.permission.RECEIVE_MMS"
  * == STORAGE
- * <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
- * <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+ * uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+ * uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
  * == Dangerous Permissions end ==
  */
 
@@ -87,15 +87,8 @@ public abstract class PermissionsHelperActivity extends AppCompatActivity {
 
     protected abstract void startFlow();
 
-    protected boolean showSettingDialog(){
-        return true;
-    }
-    protected Pair<String,String> setTitleAndContent(){
-        return null;
-    }
-
-    protected Pair<String,String> setButtonText(){
-        return null;
+    protected DialogInfo setDialogInfo(DialogInfo dialogInfo){
+        return dialogInfo;
     }
 
     protected void onNegativeButtonClick(){
@@ -108,11 +101,13 @@ public abstract class PermissionsHelperActivity extends AppCompatActivity {
 
     protected abstract void shouldNOTShowRequest();
 
+    protected void beforeRequestFinalPermissions(PermissionsHelper helper){
+        helper.continueRequestPermissions();
+    }
+    protected abstract Boolean isFirstTime();
+
     private void initParams(){
-        boolean showSettingDialog = showSettingDialog();
-        Pair<String, String> titleAndContent = setTitleAndContent();
-        Pair<String, String> buttonText = setButtonText();
-        permissionsHelper.setParams(titleAndContent,buttonText,showSettingDialog);
+        permissionsHelper.setParams(setDialogInfo(new DialogInfo()));
     }
 
     /**
@@ -126,7 +121,10 @@ public abstract class PermissionsHelperActivity extends AppCompatActivity {
         }
         String[] checkPermissions = new String[finalPermissions.size()];
         checkPermissions = finalPermissions.toArray(checkPermissions);
-        permissionsHelper = new PermissionsHelper(this, checkPermissions);
+        for (String checkPermission : checkPermissions) {
+            Log.e("test","checkPermission: "+checkPermission);
+        }
+        permissionsHelper = new PermissionsHelper(this, checkPermissions,isFirstTime());
         permissionsHelper.setonAllNeedPermissionsGrantedListener(new PermissionsHelper
                 .onAllNeedPermissionsGrantedListener() {
 
@@ -144,6 +142,11 @@ public abstract class PermissionsHelperActivity extends AppCompatActivity {
             @Override
             public void hasLockForever() {
                 shouldNOTShowRequest();
+            }
+
+            @Override
+            public void onBeforeRequestFinalPermissions(PermissionsHelper helper) {
+                beforeRequestFinalPermissions(helper);
             }
         });
 

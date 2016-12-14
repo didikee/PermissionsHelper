@@ -1,19 +1,20 @@
 package com.didikee.example;
 
-import android.util.Pair;
 import android.widget.Toast;
 
 import java.util.List;
 
 import didikee.com.permissionshelper.PermissionsHelperActivity;
+import didikee.com.permissionshelper.info.DialogInfo;
+import didikee.com.permissionshelper.permission.DangerousPermissions;
 
 public class MainActivity extends PermissionsHelperActivity {
 
     @Override
     protected void setDangerousPermissions(List<String> permissions) {
-//        permissions.add(DangerousPermissions.STORAGE);
-//        permissions.add(DangerousPermissions.CALENDAR);
-//        permissions.add(DangerousPermissions.PHONE);
+        permissions.add(DangerousPermissions.STORAGE);
+        permissions.add(DangerousPermissions.CALENDAR);
+        permissions.add(DangerousPermissions.PHONE);
     }
 
     @Override
@@ -28,18 +29,13 @@ public class MainActivity extends PermissionsHelperActivity {
     }
 
     @Override
-    protected boolean showSettingDialog() {
-        return true;
-    }
-
-    @Override
-    protected Pair<String, String> setTitleAndContent() {
-        return new Pair<>("权限申请","这些权限是我们app必须的"+"\n"+"你不给就不要用了!");
-    }
-
-    @Override
-    protected Pair<String, String> setButtonText() {
-        return new Pair<>("去设置","取消");
+    protected DialogInfo setDialogInfo(DialogInfo dialogInfo) {
+        dialogInfo.setTitle("权限申请");
+        dialogInfo.setContent("这些权限是我们app必须的"+"\\n"+"你不给就不要用了!");
+        dialogInfo.setPositiveButtonText("去设置");
+        dialogInfo.setNegativeButtonText("取消");
+        dialogInfo.showDialog(true);
+        return dialogInfo;
     }
 
     @Override
@@ -60,5 +56,16 @@ public class MainActivity extends PermissionsHelperActivity {
     @Override
     protected void shouldNOTShowRequest() {
         Toast.makeText(this, "永远不需要展示", Toast.LENGTH_SHORT).show();
+        //{ 1. length =0
+        // }
+    }
+
+    @Override
+    protected Boolean isFirstTime() {
+        boolean first = (boolean) SPUtils.getData(this, "first", false);
+        if (!first){
+            SPUtils.putData(this,"first",true);
+        }
+        return !first;
     }
 }
