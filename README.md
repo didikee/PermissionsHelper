@@ -5,7 +5,7 @@
 ### Gradle
 ```
 dependencies {
-    compile 'com.didikee:permissionsHelper:0.1.4'
+    compile 'com.didikee:permissionsHelper:0.1.8'
 }
 ```
 

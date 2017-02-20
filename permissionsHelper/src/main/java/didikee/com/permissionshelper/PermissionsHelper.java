@@ -63,7 +63,10 @@ public class PermissionsHelper {
      * @return true 所有的都有了,否则返回 false
      */
     public boolean checkAllPermissions(String... permissions) {
-        return mChecker.checkSelfPermissions(permissions);
+        if (mChecker.shouldCheckPermission()){
+            return mChecker.checkSelfPermissions(permissions);
+        }
+        return true;
     }
 
     /**

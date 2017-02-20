@@ -54,6 +54,9 @@ import didikee.com.permissionshelper.permission.DangerousPermissions;
  * uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
  * uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
  * == Dangerous Permissions end ==
+ *
+ *
+ *
  */
 
 public abstract class PermissionsHelperActivity extends AppCompatActivity {
